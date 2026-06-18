@@ -8,7 +8,7 @@ import { useBufferedNodePersistence } from '../hooks/useBufferedNodePersistence'
 import { FlowNode, ProfileState } from '../types'
 import { supabase } from '../supabase/client'
 import { deleteNode, saveNode, saveNodeSet } from '../utils/nodePersistence'
-import { buildProfileFromUser } from '../utils/profile'
+import { loadCurrentUserProfile } from '../utils/profile'
 
 interface DashboardProps {
   onLogout: () => void
@@ -182,13 +182,11 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
 
   useEffect(() => {
     const loadNodes = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { user, profile: loadedProfile } = await loadCurrentUserProfile()
       if (!user) return
 
       setCurrentUserId(user.id)
-      setProfile(buildProfileFromUser(user))
+      setProfile(loadedProfile)
 
       const { data, error } = await supabase
         .from('supply_nodes')
@@ -454,10 +452,10 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
                           Active now
                         </span>
                       </div>
-                      <div className="mt-2 truncate text-[clamp(1.6rem,2.6vw,2rem)] font-semibold leading-none tracking-[-0.04em] text-white">
+                      <div className="mt-2 text-[clamp(1.55rem,2.5vw,2rem)] font-semibold leading-[1.05] tracking-[-0.04em] text-white sm:whitespace-nowrap">
                         {profile.name}
                       </div>
-                      <div className="mt-2 truncate text-sm text-[#9aa3b2] sm:text-[15px]">
+                      <div className="mt-2 text-sm text-[#9aa3b2] sm:text-[15px] sm:whitespace-nowrap">
                         {profile.title} • {profile.team}
                       </div>
                     </div>

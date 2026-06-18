@@ -134,35 +134,43 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     }
   }
 
-  let savedProfile = {
+  const savedProfile = {
     ...trimmedProfile,
     customerNo: user.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
   const payload = buildClientProfilePayload(user, savedProfile)
-  const profileResult = await supabase.from('client_profiles').upsert(payload).select('*').single<ClientProfileRecord>()
+  const profileWrite = await supabase.from('client_profiles').upsert(payload)
 
-  if (profileResult.error) {
+  if (profileWrite.error) {
     return {
       data: null,
-      error: profileResult.error,
+      error: profileWrite.error,
       profile: savedProfile,
     }
   }
 
-  if (profileResult.data) {
-    savedProfile = mapClientProfileToState(profileResult.data)
+  const { data: profileRecord, error: profileReadError } = await supabase
+    .from('client_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle<ClientProfileRecord>()
+
+  const canonicalProfile = profileRecord ? mapClientProfileToState(profileRecord) : savedProfile
+
+  if (profileReadError) {
+    console.warn('Profile saved but could not be reloaded from client_profiles', profileReadError)
   }
 
   const { data, error: authError } = await supabase.auth.updateUser({
     data: {
-      full_name: savedProfile.name,
-      site: savedProfile.site,
-      job_title: savedProfile.title,
-      team_name: savedProfile.team,
-      focus_area: savedProfile.focusArea,
-      timezone: savedProfile.timezone,
-      avatar_emoji: savedProfile.avatar,
+      full_name: canonicalProfile.name,
+      site: canonicalProfile.site,
+      job_title: canonicalProfile.title,
+      team_name: canonicalProfile.team,
+      focus_area: canonicalProfile.focusArea,
+      timezone: canonicalProfile.timezone,
+      avatar_emoji: canonicalProfile.avatar,
     },
   })
 
@@ -173,7 +181,7 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
   return {
     data,
     error: null,
-    profile: savedProfile,
+    profile: canonicalProfile,
     warning: authError,
   }
 }
