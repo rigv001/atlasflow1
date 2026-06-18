@@ -84,6 +84,8 @@ export const loadCurrentUserProfile = async () => {
     }
   }
 
+  const profileFromAuth = buildProfileFromUser(user)
+
   const { data, error } = await supabase
     .from('client_profiles')
     .select('*')
@@ -92,11 +94,34 @@ export const loadCurrentUserProfile = async () => {
 
   if (error) {
     console.warn('Unable to load client profile record, falling back to auth metadata', error)
+    return {
+      user,
+      profile: profileFromAuth,
+    }
   }
+
+  if (!data) {
+    return {
+      user,
+      profile: profileFromAuth,
+    }
+  }
+
+  const profileFromTable = mapClientProfileToState(data)
 
   return {
     user,
-    profile: data ? mapClientProfileToState(data) : buildProfileFromUser(user),
+    profile: {
+      ...profileFromTable,
+      name: profileFromAuth.name || profileFromTable.name,
+      site: profileFromAuth.site || profileFromTable.site,
+      title: profileFromAuth.title || profileFromTable.title,
+      team: profileFromAuth.team || profileFromTable.team,
+      focusArea: profileFromAuth.focusArea || profileFromTable.focusArea,
+      timezone: profileFromAuth.timezone || profileFromTable.timezone,
+      avatar: profileFromAuth.avatar || profileFromTable.avatar,
+      customerNo: profileFromTable.customerNo || profileFromAuth.customerNo,
+    },
   }
 }
 
@@ -139,49 +164,37 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     customerNo: user.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
-  const payload = buildClientProfilePayload(user, savedProfile)
-  const profileWrite = await supabase.from('client_profiles').upsert(payload)
+  const { data, error } = await supabase.auth.updateUser({
+    data: {
+      full_name: savedProfile.name,
+      site: savedProfile.site,
+      job_title: savedProfile.title,
+      team_name: savedProfile.team,
+      focus_area: savedProfile.focusArea,
+      timezone: savedProfile.timezone,
+      avatar_emoji: savedProfile.avatar,
+    },
+  })
 
-  if (profileWrite.error) {
+  if (error) {
     return {
-      data: null,
-      error: profileWrite.error,
+      data,
+      error,
       profile: savedProfile,
     }
   }
 
-  const { data: profileRecord, error: profileReadError } = await supabase
-    .from('client_profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle<ClientProfileRecord>()
+  const payload = buildClientProfilePayload(user, savedProfile)
+  const profileWrite = await supabase.from('client_profiles').upsert(payload)
 
-  const canonicalProfile = profileRecord ? mapClientProfileToState(profileRecord) : savedProfile
-
-  if (profileReadError) {
-    console.warn('Profile saved but could not be reloaded from client_profiles', profileReadError)
-  }
-
-  const { data, error: authError } = await supabase.auth.updateUser({
-    data: {
-      full_name: canonicalProfile.name,
-      site: canonicalProfile.site,
-      job_title: canonicalProfile.title,
-      team_name: canonicalProfile.team,
-      focus_area: canonicalProfile.focusArea,
-      timezone: canonicalProfile.timezone,
-      avatar_emoji: canonicalProfile.avatar,
-    },
-  })
-
-  if (authError) {
-    console.warn('Profile saved to client_profiles but auth metadata sync failed', authError)
+  if (profileWrite.error) {
+    console.warn('Profile saved to auth metadata but client_profiles sync failed', profileWrite.error)
   }
 
   return {
     data,
     error: null,
-    profile: canonicalProfile,
-    warning: authError,
+    profile: savedProfile,
+    warning: profileWrite.error,
   }
 }
