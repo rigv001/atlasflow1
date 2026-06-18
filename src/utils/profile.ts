@@ -166,9 +166,7 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
   const payload = buildClientProfilePayload(user, savedProfile)
   const profileWrite = await supabase
     .from('client_profiles')
-    .upsert(payload)
-    .select('*')
-    .maybeSingle<ClientProfileRecord>()
+    .upsert(payload, { onConflict: 'user_id' })
 
   if (profileWrite.error) {
     return {
@@ -178,7 +176,21 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     }
   }
 
-  const canonicalProfile = profileWrite.data ? mapClientProfileToState(profileWrite.data) : savedProfile
+  const profileRead = await supabase
+    .from('client_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle<ClientProfileRecord>()
+
+  if (profileRead.error) {
+    return {
+      data: null,
+      error: profileRead.error,
+      profile: savedProfile,
+    }
+  }
+
+  const canonicalProfile = profileRead.data ? mapClientProfileToState(profileRead.data) : savedProfile
 
   const { data, error: authError } = await supabase.auth.updateUser({
     data: {

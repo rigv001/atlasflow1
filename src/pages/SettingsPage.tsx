@@ -78,7 +78,8 @@ export default function SettingsPage({ onLogout, settingsPath }: PageProps) {
       const { error, profile: savedProfile } = await saveCurrentUserProfile(profileDraft)
       if (error) {
         console.error('Failed to save profile settings', error)
-        setErrorMessage('Settings could not be saved. Please try again.')
+        const details = error instanceof Error ? error.message : 'Please try again.'
+        setErrorMessage(`Settings could not be saved. ${details}`)
         return
       }
 
@@ -87,7 +88,8 @@ export default function SettingsPage({ onLogout, settingsPath }: PageProps) {
       setStatusMessage('Settings saved successfully.')
     } catch (error) {
       console.error('Unexpected error saving profile settings', error)
-      setErrorMessage('Settings could not be saved. Please try again.')
+      const details = error instanceof Error ? error.message : 'Please try again.'
+      setErrorMessage(`Settings could not be saved. ${details}`)
     } finally {
       setIsSaving(false)
     }
