@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'reactflow/dist/style.css';
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: #050608;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AtlasFlow - Clean enterprise styling */
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  --admin-bg: #050b14;
+  --admin-surface-1: rgba(9, 18, 29, 0.92);
+  --admin-surface-2: rgba(13, 23, 36, 0.9);
+  --admin-surface-3: rgba(16, 28, 42, 0.92);
+  --admin-overlay: rgba(255, 255, 255, 0.03);
+  --admin-overlay-strong: rgba(255, 255, 255, 0.05);
+  --admin-shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.03), 0 8px 24px rgba(0, 0, 0, 0.35), 0 24px 64px rgba(0, 0, 0, 0.25);
+  --admin-shadow-md: 0 1px 0 rgba(255, 255, 255, 0.03), 0 14px 34px rgba(0, 0, 0, 0.38), 0 28px 76px rgba(0, 0, 0, 0.28);
+  --admin-shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 44px rgba(0, 0, 0, 0.4), 0 36px 96px rgba(0, 0, 0, 0.32);
+  --admin-shadow-hover: 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 42px rgba(0, 0, 0, 0.42), 0 38px 104px rgba(0, 0, 0, 0.34);
+  --admin-radius-sm: 16px;
+  --admin-radius-md: 20px;
+  --admin-radius-lg: 24px;
+  --admin-radius-xl: 28px;
+}
+
+.admin-surface {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--admin-shadow-md);
+}
+
+.admin-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+  opacity: 0.9;
+}
+
+.surface-sm {
+  background: linear-gradient(180deg, rgba(16, 28, 42, 0.92), rgba(9, 18, 29, 0.96));
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.surface-md {
+  background: linear-gradient(180deg, rgba(13, 23, 36, 0.94), rgba(9, 18, 29, 0.98));
+  box-shadow: var(--admin-shadow-md);
+}
+
+.surface-lg {
+  background: linear-gradient(180deg, rgba(16, 28, 42, 0.96), rgba(10, 18, 31, 0.98));
+  box-shadow: var(--admin-shadow-lg);
+}
+
+.admin-interactive {
+  transition: all 0.2s ease;
+}
+
+.admin-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--admin-shadow-hover);
+}
+
+.admin-muted-chip {
+  background: rgba(88, 166, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.admin-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3), 0 0 0 4px rgba(8, 145, 178, 0.18), var(--admin-shadow-sm);
+}
+
+.react-flow__node {
+  font-size: 13px;
+}
+
+/* Subtle input and button polish */
+input[type="range"] {
+  accent-color: #14b8a6;
+}
+
+button {
+  transition: all 0.1s ease;
+}
+
+/* Beautiful transparent scrollbar - smooth & modern */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #64e0dd33;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64e0dd66;
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #64e0dd33 transparent;
+}
+
+@keyframes atlas-live-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.78);
+    box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+  }
+}
+
+.atlas-live-dot {
+  animation: atlas-live-pulse 1.2s ease-in-out infinite;
+}
