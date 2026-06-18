@@ -439,12 +439,12 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
 
             <div className="bg-[#090b10] border border-[#1b2028] rounded-[18px] px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,.45)] sm:px-6 sm:py-5">
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="flex min-w-0 items-start gap-4">
+                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+                  <div className="flex min-w-0 items-start gap-4 sm:gap-5">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[radial-gradient(circle_at_30%_20%,rgba(100,224,221,0.24),rgba(10,12,18,0.92)_72%)] text-3xl shadow-[0_0_30px_rgba(100,224,221,0.08)] ring-1 ring-inset ring-[#64e0dd]/18">
                       <span>{profile.avatar}</span>
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 pr-1 sm:pr-4">
                       <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-[#6b7280]">
                         <span>Customer</span>
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/18 bg-emerald-400/8 px-2 py-1 text-[10px] font-medium tracking-[0.18em] text-[#4ade80]">
@@ -452,10 +452,10 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
                           Active now
                         </span>
                       </div>
-                      <div className="mt-2 break-words text-[clamp(1.4rem,2.4vw,2rem)] font-semibold leading-[1.08] tracking-[-0.04em] text-white">
+                      <div className="mt-2 max-w-[18ch] text-[clamp(1.7rem,2.8vw,2.4rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:max-w-none sm:text-[clamp(1.8rem,2.6vw,2.5rem)] sm:whitespace-nowrap">
                         {profile.name}
                       </div>
-                      <div className="mt-2 break-words text-sm leading-6 text-[#9aa3b2] sm:text-[15px]">
+                      <div className="mt-3 max-w-[24ch] text-[15px] leading-[1.45] text-[#9aa3b2] sm:max-w-none sm:whitespace-nowrap sm:text-[16px]">
                         {profile.title} • {profile.team}
                       </div>
                     </div>
@@ -463,7 +463,7 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
                   <button
                     type="button"
                     onClick={() => navigate(settingsPath)}
-                    className="w-fit shrink-0 self-start rounded-xl border border-white/10 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#a5b4c7] transition hover:border-[#64e0dd]/30 hover:text-[#64e0dd] hover:bg-[#64e0dd]/6 md:ml-4"
+                    className="w-fit shrink-0 self-start rounded-xl border border-white/10 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#a5b4c7] transition hover:border-[#64e0dd]/30 hover:text-[#64e0dd] hover:bg-[#64e0dd]/6 lg:ml-4"
                   >
                     Settings
                   </button>
