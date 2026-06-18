@@ -70,6 +70,15 @@ export default function SettingsPage({ onLogout, settingsPath }: PageProps) {
   const handleSave = async () => {
     if (!profileDraft) return
 
+    const formatErrorDetails = (error: unknown) => {
+      if (error instanceof Error && error.message) return error.message
+      if (error && typeof error === 'object') {
+        const candidate = error as { message?: string; details?: string; hint?: string; code?: string }
+        return [candidate.message, candidate.details, candidate.hint, candidate.code].filter(Boolean).join(' | ') || 'Please try again.'
+      }
+      return 'Please try again.'
+    }
+
     setIsSaving(true)
     setStatusMessage('')
     setErrorMessage('')
@@ -78,8 +87,7 @@ export default function SettingsPage({ onLogout, settingsPath }: PageProps) {
       const { error, profile: savedProfile } = await saveCurrentUserProfile(profileDraft)
       if (error) {
         console.error('Failed to save profile settings', error)
-        const details = error instanceof Error ? error.message : 'Please try again.'
-        setErrorMessage(`Settings could not be saved. ${details}`)
+        setErrorMessage(`Settings could not be saved. ${formatErrorDetails(error)}`)
         return
       }
 
@@ -88,8 +96,7 @@ export default function SettingsPage({ onLogout, settingsPath }: PageProps) {
       setStatusMessage('Settings saved successfully.')
     } catch (error) {
       console.error('Unexpected error saving profile settings', error)
-      const details = error instanceof Error ? error.message : 'Please try again.'
-      setErrorMessage(`Settings could not be saved. ${details}`)
+      setErrorMessage(`Settings could not be saved. ${formatErrorDetails(error)}`)
     } finally {
       setIsSaving(false)
     }
