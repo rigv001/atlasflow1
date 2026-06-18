@@ -126,7 +126,7 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data, error } = await supabase.auth.updateUser({
+  const { data, error: authError } = await supabase.auth.updateUser({
     data: {
       full_name: trimmedProfile.name,
       site: trimmedProfile.site,
@@ -140,7 +140,7 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
 
   let savedProfile = {
     ...trimmedProfile,
-    customerNo: data.user?.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
+    customerNo: data.user?.id?.slice(0, 8).toUpperCase() || user?.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
   if (user) {
@@ -158,11 +158,18 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     if (profileResult.data) {
       savedProfile = mapClientProfileToState(profileResult.data)
     }
+
+    return {
+      data,
+      error: null,
+      profile: savedProfile,
+      warning: authError,
+    }
   }
 
   return {
     data,
-    error,
+    error: authError,
     profile: savedProfile,
   }
 }

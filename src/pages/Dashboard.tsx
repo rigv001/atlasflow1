@@ -439,56 +439,59 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
               </div>
             </div>
 
-            <div className="bg-[#090b10] border border-[#1b2028] rounded-[18px] p-6 shadow-[0_8px_32px_rgba(0,0,0,.45)]">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#4ade80]">
-                      <span className="h-2 w-2 rounded-full bg-[#4ade80] atlas-live-dot" />
-                      <span>Active now</span>
-                    </div>
-                    <div className="flex h-20 w-20 items-center justify-center rounded-[24px] border border-[#64e0dd]/25 bg-[radial-gradient(circle_at_30%_20%,rgba(100,224,221,0.24),rgba(10,12,18,0.92)_72%)] text-4xl shadow-[0_0_40px_rgba(100,224,221,0.08)]">
+            <div className="bg-[#090b10] border border-[#1b2028] rounded-[18px] px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,.45)] sm:px-6 sm:py-5">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex min-w-0 items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[radial-gradient(circle_at_30%_20%,rgba(100,224,221,0.24),rgba(10,12,18,0.92)_72%)] text-3xl shadow-[0_0_30px_rgba(100,224,221,0.08)] ring-1 ring-inset ring-[#64e0dd]/18">
                       <span>{profile.avatar}</span>
                     </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-[#6b7280]">
+                        <span>Customer</span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/18 bg-emerald-400/8 px-2 py-1 text-[10px] font-medium tracking-[0.18em] text-[#4ade80]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] atlas-live-dot" />
+                          Active now
+                        </span>
+                      </div>
+                      <div className="mt-2 truncate text-[clamp(1.6rem,2.6vw,2rem)] font-semibold leading-none tracking-[-0.04em] text-white">
+                        {profile.name}
+                      </div>
+                      <div className="mt-2 truncate text-sm text-[#9aa3b2] sm:text-[15px]">
+                        {profile.title} • {profile.team}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs text-[#6b7280]">CUSTOMER</div>
-                    <div className="mt-1 text-2xl font-semibold tracking-tight text-white">{profile.name}</div>
-                    <div className="mt-1 text-sm text-[#9aa3b2]">{profile.title} • {profile.team}</div>
+                  <button
+                    type="button"
+                    onClick={() => navigate(settingsPath)}
+                    className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#a5b4c7] transition hover:border-[#64e0dd]/30 hover:text-[#64e0dd] hover:bg-[#64e0dd]/6"
+                  >
+                    Settings
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-x-8 gap-y-3 border-t border-white/6 pt-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Account No</div>
+                    <div className="mt-1 truncate text-sm font-mono text-white">{profile.customerNo}</div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => navigate(settingsPath)}
-                  className="rounded-2xl border border-[#64e0dd]/30 px-4 py-2 text-xs font-medium uppercase tracking-[0.22em] text-[#64e0dd] hover:bg-[#64e0dd]/10"
-                >
-                  Open settings
-                </button>
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-xs text-[#6b7280]">ACCOUNT NO</div>
-                  <div className="mt-1 text-sm font-mono text-white">{profile.customerNo}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-[#6b7280]">PRIMARY SITE</div>
-                  <div className="mt-1 text-sm text-white">{profile.site}</div>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-[#1b2028] bg-[#050608] px-4 py-3">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#6b7280]">Focus Area</div>
-                  <div className="mt-2 text-sm text-white">{profile.focusArea}</div>
-                </div>
-                <div className="rounded-2xl border border-[#1b2028] bg-[#050608] px-4 py-3">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#6b7280]">Timezone</div>
-                  <div className="mt-2 text-sm text-white">{profile.timezone}</div>
-                </div>
-                <div className="rounded-2xl border border-[#1b2028] bg-[#050608] px-4 py-3">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#6b7280]">Supplier Network</div>
-                  <div className="mt-2 text-sm text-white">{totalSuppliers} active suppliers</div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Primary Site</div>
+                    <div className="mt-1 truncate text-sm text-white">{profile.site}</div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Focus Area</div>
+                    <div className="mt-1 text-sm text-white">{profile.focusArea}</div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Timezone</div>
+                    <div className="mt-1 text-sm text-white">{profile.timezone}</div>
+                  </div>
+                  <div className="min-w-0 xl:col-span-2">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Supplier Network</div>
+                    <div className="mt-1 text-sm text-white">{totalSuppliers} active suppliers</div>
+                  </div>
                 </div>
               </div>
             </div>
