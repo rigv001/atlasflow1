@@ -101,27 +101,26 @@ export const loadCurrentUserProfile = async () => {
   }
 
   if (!data) {
+    const payload = buildClientProfilePayload(user, profileFromAuth)
+    const createResult = await supabase.from('client_profiles').upsert(payload).select('*').maybeSingle<ClientProfileRecord>()
+
+    if (createResult.error) {
+      console.warn('Unable to bootstrap client profile record, falling back to auth metadata', createResult.error)
+      return {
+        user,
+        profile: profileFromAuth,
+      }
+    }
+
     return {
       user,
-      profile: profileFromAuth,
+      profile: createResult.data ? mapClientProfileToState(createResult.data) : profileFromAuth,
     }
   }
 
-  const profileFromTable = mapClientProfileToState(data)
-
   return {
     user,
-    profile: {
-      ...profileFromTable,
-      name: profileFromAuth.name || profileFromTable.name,
-      site: profileFromAuth.site || profileFromTable.site,
-      title: profileFromAuth.title || profileFromTable.title,
-      team: profileFromAuth.team || profileFromTable.team,
-      focusArea: profileFromAuth.focusArea || profileFromTable.focusArea,
-      timezone: profileFromAuth.timezone || profileFromTable.timezone,
-      avatar: profileFromAuth.avatar || profileFromTable.avatar,
-      customerNo: profileFromTable.customerNo || profileFromAuth.customerNo,
-    },
+    profile: mapClientProfileToState(data),
   }
 }
 
@@ -164,37 +163,43 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     customerNo: user.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
-  const { data, error } = await supabase.auth.updateUser({
-    data: {
-      full_name: savedProfile.name,
-      site: savedProfile.site,
-      job_title: savedProfile.title,
-      team_name: savedProfile.team,
-      focus_area: savedProfile.focusArea,
-      timezone: savedProfile.timezone,
-      avatar_emoji: savedProfile.avatar,
-    },
-  })
+  const payload = buildClientProfilePayload(user, savedProfile)
+  const profileWrite = await supabase
+    .from('client_profiles')
+    .upsert(payload)
+    .select('*')
+    .maybeSingle<ClientProfileRecord>()
 
-  if (error) {
+  if (profileWrite.error) {
     return {
-      data,
-      error,
+      data: null,
+      error: profileWrite.error,
       profile: savedProfile,
     }
   }
 
-  const payload = buildClientProfilePayload(user, savedProfile)
-  const profileWrite = await supabase.from('client_profiles').upsert(payload)
+  const canonicalProfile = profileWrite.data ? mapClientProfileToState(profileWrite.data) : savedProfile
 
-  if (profileWrite.error) {
-    console.warn('Profile saved to auth metadata but client_profiles sync failed', profileWrite.error)
+  const { data, error: authError } = await supabase.auth.updateUser({
+    data: {
+      full_name: canonicalProfile.name,
+      site: canonicalProfile.site,
+      job_title: canonicalProfile.title,
+      team_name: canonicalProfile.team,
+      focus_area: canonicalProfile.focusArea,
+      timezone: canonicalProfile.timezone,
+      avatar_emoji: canonicalProfile.avatar,
+    },
+  })
+
+  if (authError) {
+    console.warn('Profile saved to client_profiles but auth metadata sync failed', authError)
   }
 
   return {
     data,
     error: null,
-    profile: savedProfile,
-    warning: profileWrite.error,
+    profile: canonicalProfile,
+    warning: authError,
   }
 }
