@@ -84,43 +84,9 @@ export const loadCurrentUserProfile = async () => {
     }
   }
 
-  const profileFromAuth = buildProfileFromUser(user)
-
-  const { data, error } = await supabase
-    .from('client_profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle<ClientProfileRecord>()
-
-  if (error) {
-    console.warn('Unable to load client profile record, falling back to auth metadata', error)
-    return {
-      user,
-      profile: profileFromAuth,
-    }
-  }
-
-  if (!data) {
-    const payload = buildClientProfilePayload(user, profileFromAuth)
-    const createResult = await supabase.from('client_profiles').upsert(payload).select('*').maybeSingle<ClientProfileRecord>()
-
-    if (createResult.error) {
-      console.warn('Unable to bootstrap client profile record, falling back to auth metadata', createResult.error)
-      return {
-        user,
-        profile: profileFromAuth,
-      }
-    }
-
-    return {
-      user,
-      profile: createResult.data ? mapClientProfileToState(createResult.data) : profileFromAuth,
-    }
-  }
-
   return {
     user,
-    profile: mapClientProfileToState(data),
+    profile: buildProfileFromUser(user),
   }
 }
 
@@ -131,17 +97,7 @@ export const loadCurrentUserRole = async (): Promise<User['role'] | null> => {
 
   if (!user) return null
 
-  const { data, error } = await supabase
-    .from('client_profiles')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle<Pick<ClientProfileRecord, 'role'>>()
-
-  if (error) {
-    console.warn('Unable to load client role, falling back to email-based admin detection', error)
-  }
-
-  return data?.role || (user.email?.toLowerCase() === 'admin1@atlasflow.edu.au' ? 'admin' : 'client')
+  return user.email?.toLowerCase() === 'admin1@atlasflow.edu.au' ? 'admin' : 'client'
 }
 
 export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
@@ -163,55 +119,21 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     customerNo: user.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
-  const payload = buildClientProfilePayload(user, savedProfile)
-  const profileWrite = await supabase
-    .from('client_profiles')
-    .upsert(payload, { onConflict: 'user_id' })
-
-  if (profileWrite.error) {
-    return {
-      data: null,
-      error: profileWrite.error,
-      profile: savedProfile,
-    }
-  }
-
-  const profileRead = await supabase
-    .from('client_profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle<ClientProfileRecord>()
-
-  if (profileRead.error) {
-    return {
-      data: null,
-      error: profileRead.error,
-      profile: savedProfile,
-    }
-  }
-
-  const canonicalProfile = profileRead.data ? mapClientProfileToState(profileRead.data) : savedProfile
-
-  const { data, error: authError } = await supabase.auth.updateUser({
+  const { data, error } = await supabase.auth.updateUser({
     data: {
-      full_name: canonicalProfile.name,
-      site: canonicalProfile.site,
-      job_title: canonicalProfile.title,
-      team_name: canonicalProfile.team,
-      focus_area: canonicalProfile.focusArea,
-      timezone: canonicalProfile.timezone,
-      avatar_emoji: canonicalProfile.avatar,
+      full_name: savedProfile.name,
+      site: savedProfile.site,
+      job_title: savedProfile.title,
+      team_name: savedProfile.team,
+      focus_area: savedProfile.focusArea,
+      timezone: savedProfile.timezone,
+      avatar_emoji: savedProfile.avatar,
     },
   })
 
-  if (authError) {
-    console.warn('Profile saved to client_profiles but auth metadata sync failed', authError)
-  }
-
   return {
     data,
-    error: null,
-    profile: canonicalProfile,
-    warning: authError,
+    error,
+    profile: savedProfile,
   }
 }
