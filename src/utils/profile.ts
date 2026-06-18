@@ -47,20 +47,6 @@ export const mapClientProfileToState = (record: ClientProfileRecord): ProfileSta
   avatar: PROFILE_AVATARS.includes(record.avatar_emoji) ? record.avatar_emoji : DEFAULT_PROFILE.avatar,
 })
 
-const buildClientProfilePayload = (user: any, profile: ProfileState): ClientProfileRecord => ({
-  user_id: user.id,
-  email: user.email || null,
-  full_name: profile.name,
-  customer_no: profile.customerNo,
-  site: profile.site,
-  job_title: profile.title,
-  team_name: profile.team,
-  focus_area: profile.focusArea,
-  timezone: profile.timezone,
-  avatar_emoji: profile.avatar,
-  role: user.email?.toLowerCase() === 'admin1@atlasflow.edu.au' ? 'admin' : 'client',
-})
-
 export const sanitizeProfileDraft = (profileDraft: ProfileState): ProfileState => ({
   ...profileDraft,
   name: profileDraft.name.trim() || DEFAULT_PROFILE.name,
