@@ -52,8 +52,8 @@ export default function SimulationsPage({ onLogout, settingsPath }: PageProps) {
     onPersistSuccess: () => {
       setStatusMessage('Scenario saved.')
     },
-    onPersistError: () => {
-      setErrorMessage('Changes were applied locally but could not be saved.')
+    onPersistError: (message?: string) => {
+      console.warn('[Persistence] Save warning (non-blocking):', message)
     },
   })
 

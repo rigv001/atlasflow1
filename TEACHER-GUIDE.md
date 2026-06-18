@@ -1,14 +1,14 @@
 # Teacher Guide
 
-This guide is designed for teachers, assessors, and reviewers who want to understand, run, and evaluate AtlasFlow as a working digital product.
+This guide is designed for Mr White.
 
 ## How to use AtlasFlow
 
 ### For a teacher, assessor, or reviewer
 
-If you are reviewing this project, the best way to explore it is:
+The best way to explore it is:
 
-1. Open the deployed application.
+1. Open the deployed application. Link: (https://atlasflow1.vercel.app/login)
 2. Create an account or sign in.
 3. Land in the client dashboard.
 4. Add suppliers manually or import them via CSV.
@@ -17,7 +17,9 @@ If you are reviewing this project, the best way to explore it is:
 7. Open reports to generate executive-style outputs.
 8. Review settings to see the customisable workspace identity.
 
-If an admin account is available, you can also inspect the admin dashboard to see the platform-level oversight experience.
+Admin Account Access:
+Email: admin1@atlasflow.edu.au
+Password: admin123!
 
 ### Typical user journey
 
@@ -41,14 +43,10 @@ Before running the project locally, make sure you have:
 - npm installed
 - a Supabase project with valid credentials
 
-### Environment variables
+(You probably won't run it locally because I hosted it on the web for you)
 
-Create a local `.env` file with the following values:
+https://atlasflow1.vercel.app/login
 
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
 
 ### Run the project locally
 
@@ -122,3 +120,5 @@ supabase/
 ## Final note
 
 AtlasFlow was created to feel like a credible product, not just a classroom mock-up. The interface, workflow, role separation, simulation tooling, and reporting layer were all designed to make the system understandable, demonstrable, and genuinely useful.
+
+Have fun marking!

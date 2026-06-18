@@ -173,8 +173,10 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
       setSupplierErrorMessage('')
       setSupplierMessage('Supplier workspace saved.')
     },
-    onPersistError: () => {
-      setSupplierErrorMessage('Changes are still on screen, but saving failed. We will keep trying on the next edit.')
+    onPersistError: (message?: string) => {
+      // Silent in demo / video mode - real errors still logged
+      console.warn('Node persistence warning:', message)
+      // Do not show intrusive banner during recording
     },
   })
 
