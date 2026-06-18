@@ -126,50 +126,54 @@ export const saveCurrentUserProfile = async (profileDraft: ProfileState) => {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data, error: authError } = await supabase.auth.updateUser({
-    data: {
-      full_name: trimmedProfile.name,
-      site: trimmedProfile.site,
-      job_title: trimmedProfile.title,
-      team_name: trimmedProfile.team,
-      focus_area: trimmedProfile.focusArea,
-      timezone: trimmedProfile.timezone,
-      avatar_emoji: trimmedProfile.avatar,
-    },
-  })
+  if (!user) {
+    return {
+      data: null,
+      error: new Error('Unable to save profile without an active session.'),
+      profile: trimmedProfile,
+    }
+  }
 
   let savedProfile = {
     ...trimmedProfile,
-    customerNo: data.user?.id?.slice(0, 8).toUpperCase() || user?.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
+    customerNo: user.id?.slice(0, 8).toUpperCase() || trimmedProfile.customerNo,
   }
 
-  if (user) {
-    const payload = buildClientProfilePayload(user, savedProfile)
-    const profileResult = await supabase.from('client_profiles').upsert(payload).select('*').single<ClientProfileRecord>()
+  const payload = buildClientProfilePayload(user, savedProfile)
+  const profileResult = await supabase.from('client_profiles').upsert(payload).select('*').single<ClientProfileRecord>()
 
-    if (profileResult.error) {
-      return {
-        data,
-        error: profileResult.error,
-        profile: savedProfile,
-      }
-    }
-
-    if (profileResult.data) {
-      savedProfile = mapClientProfileToState(profileResult.data)
-    }
-
+  if (profileResult.error) {
     return {
-      data,
-      error: null,
+      data: null,
+      error: profileResult.error,
       profile: savedProfile,
-      warning: authError,
     }
+  }
+
+  if (profileResult.data) {
+    savedProfile = mapClientProfileToState(profileResult.data)
+  }
+
+  const { data, error: authError } = await supabase.auth.updateUser({
+    data: {
+      full_name: savedProfile.name,
+      site: savedProfile.site,
+      job_title: savedProfile.title,
+      team_name: savedProfile.team,
+      focus_area: savedProfile.focusArea,
+      timezone: savedProfile.timezone,
+      avatar_emoji: savedProfile.avatar,
+    },
+  })
+
+  if (authError) {
+    console.warn('Profile saved to client_profiles but auth metadata sync failed', authError)
   }
 
   return {
     data,
-    error: authError,
+    error: null,
     profile: savedProfile,
+    warning: authError,
   }
 }
