@@ -1,5 +1,7 @@
 # AtlasFlow
 
+![AtlasFlow banner](./public/1.png)
+
 AtlasFlow is a supply-chain sustainability platform designed to help organisations map suppliers, estimate carbon intensity, test decarbonisation scenarios, and produce decision-ready reports.
 
 Built as a polished web application rather than a static prototype, AtlasFlow gives users a working client workspace and a separate admin experience. The result is a product that can be demonstrated, assessed, and used as a practical digital solution.
