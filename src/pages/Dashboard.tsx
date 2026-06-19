@@ -24,6 +24,12 @@ interface SupplierDraft {
   notes: string
 }
 
+interface ProfileMetric {
+  label: string
+  value: string
+  valueClassName?: string
+}
+
 const SUPPLIER_RISK_THRESHOLD = 100
 const SUPPLIER_CATEGORIES = ['Agriculture', 'Manufacturing', 'Logistics', 'Energy', 'Packaging', 'General']
 const DEFAULT_SUPPLIER: FlowNode = {
@@ -367,11 +373,17 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
 
   const supplierPendingDelete = supplierPendingDeleteId ? nodes.find((node) => node.id === supplierPendingDeleteId) : null
   const totalSuppliers = nodes.length
-  const avgIntensity = nodes.length > 0 ? Math.round(nodes.reduce((sum, node) => sum + node.data.carbonIntensity, 0) / nodes.length) : 0
-  const totalEmissions = Math.round(nodes.reduce((sum, node) => sum + node.data.carbonIntensity, 0))
   const highRiskSuppliers = nodes.filter((node) => node.data.carbonIntensity > SUPPLIER_RISK_THRESHOLD).length
-  const emissionsTarget = Math.max(800, Math.round(totalEmissions * 0.8))
-  const targetPct = emissionsTarget > 0 ? Math.min((totalEmissions / emissionsTarget) * 100, 100) : 0
+  const totalEmissions = nodes.reduce((sum, node) => sum + node.data.carbonIntensity, 0)
+  const avgIntensity = totalSuppliers ? Math.round(totalEmissions / totalSuppliers) : 0
+  const emissionsTarget = totalSuppliers * 85
+  const targetPct = emissionsTarget ? totalEmissions / emissionsTarget : 0
+  const profileMetrics: ProfileMetric[] = [
+    { label: 'Account No', value: profile.customerNo, valueClassName: 'font-mono tabular-nums' },
+    { label: 'Primary Site', value: profile.site },
+    { label: 'Focus Area', value: profile.focusArea },
+    { label: 'Timezone', value: profile.timezone },
+  ]
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#050608] text-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -381,6 +393,7 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
         <header className="h-24 border-b border-[#1c1f26] px-8 flex items-center justify-between flex-shrink-0 bg-[#050608]">
           <div className="flex-1 text-center">
             <div className="text-[40px] font-semibold tracking-[-0.06em] text-white">Dashboard</div>
+            <div className="mt-2 text-sm leading-5 text-amber-200 [text-shadow:0_0_10px_rgba(251,191,36,0.55),0_0_20px_rgba(245,158,11,0.3)]">For the best viewing experience, set your browser zoom to 50%.</div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -437,60 +450,50 @@ export default function Dashboard({ onLogout, settingsPath }: DashboardProps) {
               </div>
             </div>
 
-            <div className="bg-[#090b10] border border-[#1b2028] rounded-[18px] px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,.45)] sm:px-6 sm:py-5">
-              <div className="flex flex-col gap-4">
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-                  <div className="flex min-w-0 items-start gap-4 sm:gap-5">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[radial-gradient(circle_at_30%_20%,rgba(100,224,221,0.24),rgba(10,12,18,0.92)_72%)] text-3xl shadow-[0_0_30px_rgba(100,224,221,0.08)] ring-1 ring-inset ring-[#64e0dd]/18">
+            <div className="atlas-profile-card bg-[#090b10] border border-[#1b2028] rounded-[18px] shadow-[0_8px_32px_rgba(0,0,0,.45)]">
+              <div className="atlas-profile-card__inner">
+                <header className="atlas-profile-card__header">
+                  <div className="atlas-profile-card__identity">
+                    <div className="atlas-profile-card__avatar" aria-hidden="true">
                       <span>{profile.avatar}</span>
                     </div>
-                    <div className="min-w-0 flex-1 pr-1 sm:pr-4">
-                      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-[#6b7280]">
-                        <span>Customer</span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/18 bg-emerald-400/8 px-2 py-1 text-[10px] font-medium tracking-[0.18em] text-[#4ade80]">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80] atlas-live-dot" />
+                    <div className="atlas-profile-card__heading">
+                      <div className="atlas-profile-card__eyebrow-row">
+                        <span className="atlas-profile-card__eyebrow">Customer profile</span>
+                        <span className="atlas-profile-card__status">
+                          <span className="atlas-profile-card__status-dot atlas-live-dot" />
                           Active now
                         </span>
                       </div>
-                      <div className="mt-2 max-w-[18ch] text-[clamp(1.7rem,2.8vw,2.4rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:max-w-none sm:text-[clamp(1.8rem,2.6vw,2.5rem)] sm:whitespace-nowrap">
-                        {profile.name}
-                      </div>
-                      <div className="mt-3 max-w-[24ch] text-[15px] leading-[1.45] text-[#9aa3b2] sm:max-w-none sm:whitespace-nowrap sm:text-[16px]">
-                        {profile.title} • {profile.team}
+                      <div className="atlas-profile-card__name-block">
+                        <h2 className="atlas-profile-card__name">{profile.name}</h2>
+                        <div className="atlas-profile-card__meta">
+                          <p>{profile.title}</p>
+                          <p>{profile.team}</p>
+                          <p>{totalSuppliers} active suppliers</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => navigate(settingsPath)}
-                    className="w-fit shrink-0 self-start rounded-xl border border-white/10 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#a5b4c7] transition hover:border-[#64e0dd]/30 hover:text-[#64e0dd] hover:bg-[#64e0dd]/6 lg:ml-4"
+                    className="atlas-profile-card__settings admin-focus-ring"
                   >
                     Settings
                   </button>
-                </div>
+                </header>
 
-                <div className="grid grid-cols-1 gap-x-8 gap-y-3 border-t border-white/6 pt-4 sm:grid-cols-2 xl:grid-cols-3">
-                  <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Account No</div>
-                    <div className="mt-1 truncate text-sm font-mono text-white">{profile.customerNo}</div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Primary Site</div>
-                    <div className="mt-1 truncate text-sm text-white">{profile.site}</div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Focus Area</div>
-                    <div className="mt-1 text-sm text-white">{profile.focusArea}</div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Timezone</div>
-                    <div className="mt-1 text-sm text-white">{profile.timezone}</div>
-                  </div>
-                  <div className="min-w-0 xl:col-span-2">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#5f6978]">Supplier Network</div>
-                    <div className="mt-1 text-sm text-white">{totalSuppliers} active suppliers</div>
-                  </div>
-                </div>
+                <div className="atlas-profile-card__divider" aria-hidden="true" />
+
+                <dl className="atlas-profile-card__metrics">
+                  {profileMetrics.map((metric) => (
+                    <div key={metric.label} className="atlas-profile-card__metric">
+                      <dt className="atlas-profile-card__metric-label">{metric.label}</dt>
+                      <dd className={`atlas-profile-card__metric-value ${metric.valueClassName ?? ''}`.trim()}>{metric.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
             </div>
           </div>

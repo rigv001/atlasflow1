@@ -1,6 +1,3 @@
-// AtlasFlow - Sign up page
-// New users always sign up as Client role
-
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase/client'
@@ -21,7 +18,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
   const [successMessage, setSuccessMessage] = useState('')
   const navigate = useNavigate()
 
-  // --- Section: Handle sign up ---
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -60,7 +56,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
 
       if (error) throw error
 
-      // Handle email confirmation case (common in Supabase for production)
       if (data.user && !data.session) {
         setSuccessMessage('Account created! Please check your email to confirm your account before logging in.')
         setTimeout(() => {
@@ -85,7 +80,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
       <ParticleBackground />
 
       <div className="w-full max-w-[380px] relative z-10">
-        {/* Logo + Brand */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <img
             src="/logo11.png"
@@ -95,7 +89,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
           <span className="text-3xl font-semibold text-white tracking-tight">AtlasFlow</span>
         </div>
 
-        {/* Heading */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-white tracking-tight">Create Account</h1>
           <p className="mt-2 text-sm text-gray-400">
@@ -106,7 +99,6 @@ export default function Signup({ onSignup, onSwitchToLogin }: SignupProps) {
           </p>
         </div>
 
-        {/* Form Card */}
         <div className="bg-[#111111] border border-[#222222] rounded-2xl p-8">
           {error && (
             <div className="mb-5 p-3 bg-red-950 text-red-400 rounded-xl text-sm border border-red-900">

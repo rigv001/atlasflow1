@@ -1,6 +1,3 @@
-// AtlasFlow - Login page
-// Simple email + password login with role check
-
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase/client'
@@ -19,7 +16,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // --- Section: Handle login ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -51,7 +47,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
       <ParticleBackground />
 
       <div className="w-full max-w-[380px] relative z-10">
-        {/* Logo + Brand */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <img
             src="/logo11.png"
@@ -61,7 +56,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
           <span className="text-3xl font-semibold text-white tracking-tight">AtlasFlow</span>
         </div>
 
-        {/* Heading */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-white tracking-tight">Welcome Back</h1>
           <p className="mt-2 text-sm text-gray-400">
@@ -72,7 +66,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
           </p>
         </div>
 
-        {/* Form Card */}
         <div className="bg-[#111111] border border-[#222222] rounded-2xl p-8">
           {error && (
             <div className="mb-5 p-3 bg-red-950 text-red-400 rounded-xl text-sm border border-red-900">
@@ -81,7 +74,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-sm text-gray-400 mb-1.5">Email</label>
               <div className="relative">
@@ -96,7 +88,6 @@ export default function Login({ onLogin, onSwitchToSignup }: LoginProps) {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm text-gray-400 mb-1.5">Password</label>
               <div className="relative">

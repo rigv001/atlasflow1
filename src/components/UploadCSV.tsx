@@ -1,6 +1,3 @@
-// AtlasFlow - CSV upload component
-// Lets users upload a simple CSV to add supplier nodes
-
 import Papa from 'papaparse'
 import { FlowNode } from '../types'
 
@@ -19,7 +16,6 @@ interface CsvRow {
 }
 
 export default function UploadCSV({ onNodesAdd, onStatusChange, onError }: UploadCSVProps) {
-  // --- Section: Handle file upload ---
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -63,7 +59,6 @@ export default function UploadCSV({ onNodesAdd, onStatusChange, onError }: Uploa
       },
     })
 
-    // Reset the input
     event.target.value = ''
   }
 

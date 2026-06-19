@@ -1,14 +1,9 @@
-// AtlasFlow - Type definitions
-// Keep it simple so it's easy to follow
-
-// --- Section: User and role types ---
 export interface User {
   id: string
   email: string
   role: 'client' | 'admin'
 }
 
-// --- Section: Node for the flow graph ---
 export interface FlowNode {
   id: string
   type: string
